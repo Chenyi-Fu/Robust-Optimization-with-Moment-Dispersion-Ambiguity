@@ -6,7 +6,7 @@ Code for the paper "Robust Optimization with Moment-Dispersion Ambiguity" by Li 
 # Cite
 To cite the contents of this repository, please cite both the paper and this repo, using their respective DOIs.
 Below is the BibTex for citing this snapshot of the repository.
-> @misc{bauhoc2024pccc,
+> @misc{chen2024robust,
   author =        {Li Chen, Chenyi Fu, Fan Si, Melvyn Sim, Peng Xiong},
   publisher =     {Operations Research},
   title =         {{Robust Optimization with Moment-Dispersion Ambiguity}},
