@@ -987,13 +987,14 @@ def one_test(r, corr='default', factor='gaussian'):
     z_in = samp_func(mu0, Q, in_size).values
     z_out = samp_func(mu0, Q, out_size).values
     # z_out = numpy.append(z_out,z_in,axis=0)
-    print(z_out.shape)
+    # print(z_out.shape)
     # z_out = z_in
 
     # z_saa = np.array([np.random.choice(z_in[:, i], size=saa_size)
     #                   for i in range(z_in.shape[1])]).T
     z_saa = z_in
     mu = z_in.mean(axis=0)
+    std = z_in.std(axis=0)
     # z_upper = z_in.max(axis=0)*15
     # z_lower = z_in.min(axis=0)*15
     # print(mu)
@@ -1011,6 +1012,14 @@ def one_test(r, corr='default', factor='gaussian'):
     mean_out = {}
     mean_out['SAA'] = x_sa @ mu_out
     mean_out['Clairvoyance'] = x_cla @ mu_out
+
+    x[f'RO-CM-{r}'], obj['RO-CM'] = ro_cm_cvar(mu, std, epsilon)
+    x[f'RO-MM-{r}'], obj['RO-MM'] = ro_mm_cvar(mu, std, epsilon)
+    cvar_out['RO-CM'] = out_sample_test(x[f'RO-CM-{r}'], z_out, epsilon)
+    cvar_out['RO-MM'] = out_sample_test(x[f'RO-MM-{r}'], z_out, epsilon)
+
+    mean_out['RO-CM'] = x[f'RO-CM-{r}'] @ mu_out
+    mean_out['RO-MM'] = x[f'RO-MM-{r}'] @ mu_out
 
     # gamma = 0.01
     Gamma = 20
@@ -1375,8 +1384,8 @@ def plot_mean_var(mean_results, cvar_results):
 
 # ### Figures in the Paper
 #
-# #### Figures 5, 6 and 7
-#
+# #### Figure 4
+
 I = J = 20
 epsilon = 0.05
 # change the value of the following three parameters
@@ -1419,7 +1428,7 @@ mean_results = pd.DataFrame(mean_results)
 obj_results = pd.DataFrame(obj_results)
 # x_results = pd.DataFrame(x_results)
 
-resultPath = f'portfolio_data_driven_guassian_{in_size}_{epsilon}.xlsx'
+resultPath = 'fix 4.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
 mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
@@ -1427,13 +1436,14 @@ obj_results.to_excel(writer, sheet_name="obj", index=False, na_rep=0, inf_rep=0)
 df.to_excel(writer, sheet_name="x", index=False, na_rep=0, inf_rep=0)
 writer.close()
 
-# #### Figures 6 and 7
+
+# #### Figure 5
 #
 I = J = 20
-epsilon = 0.2
+epsilon = 0.05
 # change the value of the following three parameters
-in_size = 20000
-saa_size = 20000
+in_size = 20
+saa_size = 20
 out_size = 10000
 
 repeats = 50
@@ -1446,8 +1456,8 @@ for r in range(repeats):
     if (r + 1) % 10 == 0:
         print(f'Repeat {r + 1} ...')
     # use either one_test or one_test_cm
-    cvar_out, mean_out, obj_out, x = one_test(r,factor='gaussian')  # change the value of 'factor' equaling to gaussian or beta
-    # cvar_out, mean_out, obj_out, x = one_test_cm(r,corr='weak')
+    cvar_out, mean_out, obj_out, x = one_test(r,factor='beta')  # change the value of 'factor' equaling to gaussian or beta
+    # cvar_out, mean_out, obj_out, x = one_test_cm(r)
     cvar_results.append(cvar_out)
     mean_results.append(mean_out)
     obj_results.append(obj_out)
@@ -1471,7 +1481,59 @@ mean_results = pd.DataFrame(mean_results)
 obj_results = pd.DataFrame(obj_results)
 # x_results = pd.DataFrame(x_results)
 
-resultPath = f'portfolio_data_driven_guassian_large_{in_size}_{epsilon}.xlsx'
+resultPath = 'fix 5.xlsx'
+writer = pd.ExcelWriter(resultPath)
+cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
+mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
+obj_results.to_excel(writer, sheet_name="obj", index=False, na_rep=0, inf_rep=0)
+df.to_excel(writer, sheet_name="x", index=False, na_rep=0, inf_rep=0)
+writer.close()
+
+#
+# #### Figure 6
+#
+I = J = 20
+epsilon = 0.05
+# change the value of the following three parameters
+in_size = 20000
+saa_size = 20000
+out_size = 10000
+
+repeats = 50
+
+cvar_results = []
+mean_results = []
+obj_results = []
+x_results = []
+for r in range(repeats):
+    if (r + 1) % 10 == 0:
+        print(f'Repeat {r + 1} ...')
+    # use either one_test or one_test_cm
+    cvar_out, mean_out, obj_out, x = one_test(r,factor='gaussian')
+    cvar_results.append(cvar_out)
+    mean_results.append(mean_out)
+    obj_results.append(obj_out)
+    x_results.append(x)
+# print(x_results)
+# print(obj_results)
+
+combined_dict = {k: v for d in x_results for k, v in d.items()}
+
+# Convert the combined dictionary to a pandas DataFrame
+df = pd.DataFrame(combined_dict)
+
+#
+# for d in x_results:
+#     temp_df = pd.DataFrame({k: pd.Series(v) for k, v in d.items()})
+#     df = pd.concat([df, temp_df], ignore_index=True)
+# print(df)
+
+cvar_results = pd.DataFrame(cvar_results)
+mean_results = pd.DataFrame(mean_results)
+obj_results = pd.DataFrame(obj_results)
+# x_results = pd.DataFrame(x_results)
+
+resultPath = 'fig 6.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
 mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
@@ -1480,8 +1542,96 @@ df.to_excel(writer, sheet_name="x", index=False, na_rep=0, inf_rep=0)
 writer.close()
 
 
+# #### Figure 7
+cvar_results = []
+mean_results = []
+obj_results = []
+x_results = []
+for r in range(repeats):
+    if (r + 1) % 10 == 0:
+        print(f'Repeat {r + 1} ...')
+    # use either one_test or one_test_cm
+    cvar_out, mean_out, obj_out, x = one_test(r,factor='beta')
+    cvar_results.append(cvar_out)
+    mean_results.append(mean_out)
+    obj_results.append(obj_out)
+    x_results.append(x)
+# print(x_results)
+# print(obj_results)
 
-# ## Figures 8 and 9
+combined_dict = {k: v for d in x_results for k, v in d.items()}
+
+# Convert the combined dictionary to a pandas DataFrame
+df = pd.DataFrame(combined_dict)
+
+#
+# for d in x_results:
+#     temp_df = pd.DataFrame({k: pd.Series(v) for k, v in d.items()})
+#     df = pd.concat([df, temp_df], ignore_index=True)
+# print(df)
+
+cvar_results = pd.DataFrame(cvar_results)
+mean_results = pd.DataFrame(mean_results)
+obj_results = pd.DataFrame(obj_results)
+# x_results = pd.DataFrame(x_results)
+
+resultPath = 'fig 7.xlsx'
+writer = pd.ExcelWriter(resultPath)
+cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
+mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
+obj_results.to_excel(writer, sheet_name="obj", index=False, na_rep=0, inf_rep=0)
+df.to_excel(writer, sheet_name="x", index=False, na_rep=0, inf_rep=0)
+writer.close()
+#
+# # ## Figure 8
+I = J = 20
+step = 50
+epsilon = 0.05
+period_type = 'W'
+q = 0.8
+repeats = 1
+combine = 50
+df = pd.read_csv('../data/daily_returns.csv', index_col=0)
+df = df.set_index(pd.DatetimeIndex(pd.to_datetime(df.index)))
+
+df = df + 1
+period_stock = df.resample(period_type).prod() - 1
+name = period_stock.index
+period_stock = period_stock.drop(name[-1])
+# print(period_stock)
+n, m = period_stock.shape
+cvar_results = []
+mean_results = []
+cumu_results = []
+for s in range(combine):
+    np.random.seed(2000+s)
+    sample = period_stock.sample(n=I, axis=1)
+    # print(sample.index.values[-50:])
+    sample = sample.values
+    for r in range(repeats):
+
+        z = sample[n - step - r:n - r, :]
+        if (r + 1) % 10 == 0:
+            print(f'Repeat {r + 1} ...')
+
+        cvar_out, mean_out, cumu_out = one_test_sp(z)
+        cvar_results.append(cvar_out)
+        mean_results.append(mean_out)
+        cumu_results.append(cumu_out)
+
+
+cvar_results = pd.DataFrame(cvar_results)
+mean_results = pd.DataFrame(mean_results)
+cumu_results = pd.DataFrame(cumu_results)
+resultPath = 'fig 8.xlsx'
+writer = pd.ExcelWriter(resultPath)
+cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
+mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
+cumu_results.to_excel(writer, sheet_name="cumu", index=False, na_rep=0, inf_rep=0)
+writer.close()
+#
+# ## Figure 9
+I = J = 20
 step = 50
 epsilon = 0.2
 period_type = 'W'
@@ -1520,76 +1670,9 @@ for s in range(combine):
 cvar_results = pd.DataFrame(cvar_results)
 mean_results = pd.DataFrame(mean_results)
 cumu_results = pd.DataFrame(cumu_results)
-resultPath = f'portfolio_sp_40_10_week_cumu_cm_{epsilon}.xlsx'
+resultPath = 'fig 9.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
 mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
 cumu_results.to_excel(writer, sheet_name="cumu", index=False, na_rep=0, inf_rep=0)
 writer.close()
-
-
-
-# #### Figure 4.
-# step = 1000
-# q = 0.8
-# repeats = 1
-# combine = 50
-# df = pd.read_csv('daily_returns.csv', index_col=0)
-# n, m = df.shape
-# cvar_results = []
-# mean_results = []
-# cumu_results = []
-# for s in range(combine):
-#     np.random.seed(2000+s)
-#     sample = df.sample(n=I, axis=1)
-#     print(sample)
-#     sample = sample.values
-#     for r in range(repeats):
-#
-#         z = sample[n - step - r:n - r, :]
-#         if (r + 1) % 10 == 0:
-#             print(f'Repeat {r + 1} ...')
-#
-#         cvar_out, mean_out, cumu_out = one_test_sp(z)
-#         cvar_results.append(cvar_out)
-#         mean_results.append(mean_out)
-#         cumu_results.append(cumu_out)
-#
-#
-# cvar_results = pd.DataFrame(cvar_results)
-# mean_results = pd.DataFrame(mean_results)
-# cumu_results = pd.DataFrame(cumu_results)
-# resultPath = 'portfolio_sp_800_200_cumu.xlsx'
-# writer = pd.ExcelWriter(resultPath)
-# cvar_results.to_excel(writer, sheet_name="cvar", index=False, na_rep=0, inf_rep=0)
-# mean_results.to_excel(writer, sheet_name="mean", index=False, na_rep=0, inf_rep=0)
-# cumu_results.to_excel(writer, sheet_name="cumu", index=False, na_rep=0, inf_rep=0)
-# writer.close()
-
-
-
-
-### Figures in the Paper
-
-#### data generation for infinite constraint ambiguity set
-# repeats = 50
-#
-# mu_results = []
-# Sigma_results = []
-# for r in range(repeats):
-#     if (r + 1) % 10 == 0:
-#         print(f'Repeat {r + 1} ...')
-#     mu, Sigma, upper, lower = one_test_data_generation(r)
-#     mu = pd.DataFrame(mu)
-#     Sigma = pd.DataFrame(Sigma)
-#     upper = pd.DataFrame(upper)
-#     lower = pd.DataFrame(lower)
-#
-#     resultPath = f'parameter//random_Gaussian//portfolio_parameter_{r}.xlsx'
-#     writer = pd.ExcelWriter(resultPath)
-#     mu.to_excel(writer, sheet_name="mu", index=False, na_rep=0, inf_rep=0)
-#     Sigma.to_excel(writer, sheet_name="Sigma", index=False, na_rep=0, inf_rep=0)
-#     upper.to_excel(writer, sheet_name="upper", index=False, na_rep=0, inf_rep=0)
-#     lower.to_excel(writer, sheet_name="lower", index=False, na_rep=0, inf_rep=0)
-#     writer.close()
-

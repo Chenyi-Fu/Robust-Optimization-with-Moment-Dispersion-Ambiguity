@@ -1408,8 +1408,8 @@ def plot_mean_var(mean_results, cvar_results):
 I = J = 20
 epsilon = 0.05
 
-in_size = 5
-saa_size = 10
+in_size = 100
+saa_size = 1000
 out_size = 10000
 
 repeats = 50
@@ -1426,13 +1426,13 @@ for r in range(repeats):
 
 cvar_results = pd.DataFrame(cvar_results)
 mean_results = pd.DataFrame(mean_results)
-resultPath = 'portfolio_gaussian_v3.xlsx'
+resultPath = 'fig 1.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer,sheet_name = "cvar",index = False,na_rep = 0,inf_rep = 0)
 mean_results.to_excel(writer,sheet_name = "mean",index = False,na_rep = 0,inf_rep = 0)
 writer.close()
 
-# # #### Figure 2. Out-of-sample CVaR comparison of the models under random $Q$ and Beta factors
+# #### Figure 2. Out-of-sample CVaR comparison of the models under random $Q$ and Beta factors
 cvar_results = []
 mean_results = []
 for r in range(repeats):
@@ -1445,13 +1445,13 @@ for r in range(repeats):
 cvar_results = pd.DataFrame(cvar_results)
 mean_results = pd.DataFrame(mean_results)
 plot_results(cvar_results)
-resultPath = 'portfolio_beta.xlsx'
+resultPath = 'fig 2.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer,sheet_name = "cvar",index = False,na_rep = 0,inf_rep = 0)
 mean_results.to_excel(writer,sheet_name = "mean",index = False,na_rep = 0,inf_rep = 0)
 writer.close()
-
-# # #### Figure 3. Out-of-sample CVaR comparison of the four models under random $Q$ (weak correlations) and Gaussian factors
+#
+# # # #### Figure 3. Out-of-sample CVaR comparison of the four models under random $Q$ (weak correlations) and Gaussian factors
 cvar_results = []
 mean_results = []
 for r in range(repeats):
@@ -1463,36 +1463,8 @@ for r in range(repeats):
 
 cvar_results = pd.DataFrame(cvar_results)
 mean_results = pd.DataFrame(mean_results)
-resultPath = 'portfolio_week.xlsx'
+resultPath = 'fig 3.xlsx'
 writer = pd.ExcelWriter(resultPath)
 cvar_results.to_excel(writer,sheet_name = "cvar",index = False,na_rep = 0,inf_rep = 0)
 mean_results.to_excel(writer,sheet_name = "mean",index = False,na_rep = 0,inf_rep = 0)
 writer.close()
-
-# #### Figure 7 ############################################
-
-# for epsilon in [0.01,0.02,0.05,0.08,0.1]:
-#     cvar_results = []
-#     mean_results = []
-#     obj_results = []
-#     time_results = []
-#     for r in range(repeats):
-#         if (r+1)%10 == 0:
-#             print(f'Repeat {r+1} ...')
-#         cvar_out, mean_out, obj_in, time_in = one_test_infty(r,epsilon)
-#         cvar_results.append(cvar_out)
-#         mean_results.append(mean_out)
-#         obj_results.append(obj_in)
-#         time_results.append(time_in)
-#
-#     cvar_results = pd.DataFrame(cvar_results)
-#     mean_results = pd.DataFrame(mean_results)
-#     obj_results = pd.DataFrame(obj_results)
-#     time_results = pd.DataFrame(time_results)
-#     resultPath = f'portfolio_infty3_{epsilon}.xlsx'
-#     writer = pd.ExcelWriter(resultPath)
-#     cvar_results.to_excel(writer,sheet_name = "cvar",index = False,na_rep = 0,inf_rep = 0)
-#     mean_results.to_excel(writer,sheet_name = "mean",index = False,na_rep = 0,inf_rep = 0)
-#     obj_results.to_excel(writer,sheet_name = "obj",index = False,na_rep = 0,inf_rep = 0)
-#     time_results.to_excel(writer,sheet_name = "time",index = False,na_rep = 0,inf_rep = 0)
-#     writer.close()
