@@ -19,8 +19,9 @@ This code is used to generate the results in Section 5.
 
 # Installation
 1. Clone this repository
-2. Install Gurobi (https://www.gurobi.com/). Gurobi is a commercial mathematical programming solver. Free academic licenses are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
-3. Run the Python files
+2. Install Gurobi (https://www.gurobi.com/) and mosek (https://www.mosek.com/). Gurobi is a commercial mathematical programming solver. Free academic licenses are available [here](https://www.gurobi.com/academia/academic-program-and-licenses/).
+3. Install package RSOME (https://xiongpengnus.github.io/rsome/get_start)
+4. Run the Python files
 
 # Results
 All detailed results are available in the results folder.
